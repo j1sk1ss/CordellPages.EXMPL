@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  
+	  <title> Регистрация </title>
+	  
+	  <link rel="stylesheet" href="styles/login.css">
+	</head>
+	
+	<body>
+		<header>
+			<h1> Регистрация </h1>
+		</header>
+		
+		<main>
+			<section id="loginForm">
+				<h2> Вход в аккаунт </h2>
+				<form id="signupForm">
+					<label for="login"> Логин: </label>
+					<input type="text" id="login" name="login" required autocomplete="username">
+					
+					<label for="password"> Пароль: </label>
+					<input type="password" id="password" name="password" required autocomplete="current-password">
+					
+					<button id="loginButton" type="button"> Войти в аккаунт </button>
+				</form>
+				<p id="status"></p>
+			</section>
+		</main>
+
+		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+		<script src="../scripts/user.js"></script>
+		<script>
+		  $(document).ready(function() {
+			$('#loginButton').on('click', function() {
+			  $.ajax({
+				dataType: 'json',
+			  
+				url: 'http://212.233.76.232:443/post_method',
+				type: 'POST', 
+				contentType: 'application/json', 
+				data: JSON.stringify({
+					user_side_data: {
+					  operation_type: 'Login user',
+					  user_data: {
+						login: $('#login').val(),
+						password: $('#password').val(),
+					  },
+					},
+				}),
+
+				success: function(response) {
+				  console.log('Login successful:', response);
+				  if (response['response'] == 'Succes login') {
+						registerUser(response['user']['user_name'], response['user']['admin']);
+						window.location.replace("http://212.233.76.232/");
+				  }
+				  
+				  if (response['response'] == 'Wrong password') {
+						$('#status').text('Ошибка в логине или пароле');
+				  }
+				},
+				error: function(error) {
+				  console.error('Error login:', error);
+				  $('#status').text(response['response']);
+				},
+			  });
+			});
+		  });
+		</script>
+		
+		<footer>
+			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+		</footer>
+	</body>
+</html>
+

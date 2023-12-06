@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title> Контакты </title>
+		
+		<link rel="stylesheet" href="../styles.css">
+		<script src="../scripts/user.js"></script>
+	</head>
+	
+	<body>
+		<header>
+			<h1 id="welcome-message"> Контакты </h1>
+			<nav>
+				<ul id="navigation-list">
+					<li><a href="../index.html"> Главная </a></li>
+					<li><a href="/pages/about.html"> О нас </a></li>
+					<li><a href="/pages/contacts.html"> Контакты </a></li>
+				</ul>
+			</nav>
+			
+			<div class="auth-buttons" style="styles.css">
+				<button id="authButton" onclick="redirect_login()"> Авторизоваться </button>
+				<button id="createButton" onclick="redirect_signup()"> Создать аккаунт </button>
+			</div>
+		</header>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var storedUser = localStorage.getItem('current_user');
+
+				if (storedUser) {
+					var currentUser = JSON.parse(storedUser);
+					
+					document.getElementById("authButton").innerText = "Сменить аккаунт";
+					document.getElementById("createButton").innerText = "Выйти";
+					document.getElementById("createButton").onclick = exit_user;
+				}
+			});
+			
+			function exit_user() {
+				localStorage.clear();
+				window.location.href = 'index.html';
+			}
+		
+			function redirect_signup() {
+				window.location.href = '../pages/signup.html';
+			}
+			
+			function redirect_login() {
+				window.location.href = '../pages/login.html';
+			}
+		</script>
+
+		<main>
+			<section id="home">
+				<h2> Контакты </h2>
+				
+				<p>
+					Не стесняйтесь связаться с нами, чтобы узнать больше о наших уникальных услугах и начать путь сотрудничества. Наши контактные данные следующие:
+					<br>
+					Email: cordell.confirm@gmail.com
+					<br>
+					Телефон: 8 800 555 353 5
+				</p>
+			</section>
+		</main>
+
+		<footer>
+			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+		</footer>
+	</body>
+</html>
+

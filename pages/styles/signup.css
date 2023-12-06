@@ -1,0 +1,143 @@
+/* Style the navigation list */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #555;
+    color: lightgreen;
+    padding: 1em;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: #333; /* Background color for the navigation bar */
+    overflow: hidden;
+}
+
+/* Style the list items */
+ul li {
+    float: left;
+}
+
+/* Style the links */
+ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+/* Change link color on hover */
+ul li a:hover {
+    background-color: #555; /* Darker background color on hover */
+}
+
+/* Общие стили для формы и раздела */
+main {
+    margin: 20px;
+}
+
+#signup-form {
+	position: relative;
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.g-recaptcha {
+    position: absolute;
+    top: 120%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -20px; /* Вы можете настроить это значение в зависимости от дизайна */
+}
+
+/* Стили для заголовка */
+#signup-form h2 {
+    text-align: center;
+    color: #333;
+}
+
+/* Стили для формы */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input {
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#mailConfirmButton {
+    background-color: #FAF99;
+    color: black;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#mailConfirmButton:hover {
+    background-color: #FAF10;
+}
+
+#codeConfirmButton {
+    background-color: #FAF99;
+    color: black;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#codeConfirmButton:hover {
+    background-color: #FAF10;
+}
+
+#signupButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#signupButton:hover {
+    background-color: #45a049;
+}
+
+/* Стили для статуса */
+#status {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+footer {
+    background-color: #555;
+    color: white;
+    text-align: center;
+    padding: 1em;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

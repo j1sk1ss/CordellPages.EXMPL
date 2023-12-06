@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title> О нас </title>
+		
+		<link rel="stylesheet" href="../styles.css">
+		<script src="../scripts/user.js"></script>
+	</head>
+
+	<body>
+		<header>
+			<h1 id="welcome-message"> О нас </h1>
+			<nav>
+				<ul id="navigation-list">
+					<li><a href="../index.html"> Главная </a></li>
+					<li><a href="/pages/about.html"> О нас </a></li>
+					<li><a href="/pages/contacts.html"> Контакты </a></li>
+				</ul>
+			</nav>
+			
+			<div class="auth-buttons" style="styles.css">
+				<button id="authButton" onclick="redirect_login()"> Авторизоваться </button>
+				<button id="createButton" onclick="redirect_signup()"> Создать аккаунт </button>
+			</div>
+		</header>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var storedUser = localStorage.getItem('current_user');
+
+				if (storedUser) {
+					var currentUser = JSON.parse(storedUser);
+
+					document.getElementById("authButton").innerText = "Сменить аккаунт";
+					document.getElementById("createButton").innerText = "Выйти";
+					document.getElementById("createButton").onclick = exit_user;
+				}
+			});
+			
+			function exit_user() {
+				localStorage.clear();
+				window.location.href = 'index.html';
+			}
+		
+			function redirect_signup() {
+				window.location.href = '../pages/signup.html';
+			}
+			
+			function redirect_login() {
+				window.location.href = '../pages/login.html';
+			}
+		</script>
+
+		<main>
+			<section id="home">
+				<div class="about-us">
+					<h2 class="about-heading"> О нас</h2>
+					<p class="about-text"> Наша компания специализируется на предоставлении высококачественных услуг по написанию дипломных работ. Мы объединяем команду талантливых писателей и экспертов, готовых поддержать вас в каждом этапе написания диплома. Здесь представлены примеры наших работ: </p>
+					<ul class="examples-list">
+						<li class="example"> Пример диплома по экономике </li>
+						<li class="example"> Пример курсовой по программированию </li>
+						<li class="example"> Пример работы по психологии </li>
+					</ul>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+		</footer>
+	</body>
+</html>
+

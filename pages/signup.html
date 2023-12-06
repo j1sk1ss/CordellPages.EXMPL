@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script src="../scripts/user.js"></script>
+		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+		<script src="https://www.google.com/recaptcha/enterprise.js?render=6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif"></script>
+	
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title> Регистрация </title>
+		
+		<link rel="stylesheet" href="styles/signup.css">
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	</head>
+	
+	<body>
+		<header>
+			<h1> Регистрация </h1>
+		</header>
+
+		<main>
+			<section id="signup-form">
+				<h2> Создание аккаунта </h2>
+				
+				<form id="signupForm">
+					<label for="new-login"> Новый логин: </label>
+					<input type="text" id="new-login" name="new-login" required>
+					
+					<label for="mail" id="mail-lable"> Почта: </label>
+					<input type="text" id="mail" name="mail" required>
+					
+					<button id="mailConfirmButton" type="button"> Подтвердить почту </button>
+					<button id="codeConfirmButton" type="button" hidden="hidden"> Подтвердить код </button>
+					
+					<label for="new-password"> Новый пароль: </label>
+					<input type="password" id="new-password" name="new-password" required>
+					
+					<button id="signupButton" onclick="submitForm()" type="button"> Создать аккаунт </button>
+				</form>
+				
+				<form id="captchaForm" method="POST" action="http://212.233.76.232:443/captcha">
+					<div class="g-recaptcha" data-sitekey="6LfvAycpAAAAAAMuClBB8cInJC2-Ur669NIBPvdy"></div>
+					<br/>
+					
+					<input type="submit" value="Submit" id="submitButton" style="display: none;">
+				</form>
+
+				<p id="status"></p>
+			</section>
+		</main>
+		
+		<script>
+			let confirmed = false;
+			let captcha = false;
+			let mail = '';
+		
+			function submitForm() {
+				var formData = new FormData(document.getElementById('captchaForm'));
+				var headers = new Headers();
+				headers.append('Content-Type', 'application/json');
+
+				fetch('http://212.233.76.232:443/captcha', {
+					method: 'POST',
+					headers: headers,
+					body: JSON.stringify(Object.fromEntries(formData)),
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data['response'] == 'Captcha solved') {
+						captcha = true;
+						create_account();
+					}
+				})
+				.catch(error => console.error('Error: ', error););
+			}
+		
+			$(document).ready(function() {
+				$('#mailConfirmButton').on('click', function() {
+					mail = $('#mail').val();
+					$.ajax({
+						dataType: 'json',
+					  
+						url: 'http://212.233.76.232:443/mail_confirm',
+						type: 'POST', 
+						contentType: 'application/json', 
+						data: JSON.stringify({
+							data: {
+								operation_type: 'Generate code',
+								mail: $('#mail').val()
+							},
+						}),
+
+						success: function(response) {
+							alert(response['response']);
+							
+							document.getElementById('mail').value = '';
+							document.getElementById('mail-lable').textContent = 'Код:';
+							
+							document.getElementById('codeConfirmButton').removeAttribute("hidden");					
+							document.getElementById('mailConfirmButton').setAttribute("hidden", "hidden");
+						},
+						error: function(error) {
+							console.error('Error: ', error);
+						},
+					});
+				});
+				
+				$('#codeConfirmButton').on('click', function() {
+					$.ajax({
+						dataType: 'json',
+					  
+						url: 'http://212.233.76.232:443/mail_confirm',
+						type: 'POST', 
+						contentType: 'application/json', 
+						data: JSON.stringify({
+							data: {
+								operation_type: 'Confirm code',
+								code: $('#mail').val(),
+								mail: mail,
+							},
+						}),
+
+						success: function(response) {
+							alert(response['response']);
+							if (response['response'] == 'Mail verified') {
+								confirmed = true;
+							}
+						},
+						
+						error: function(error) {
+							console.error('Error: ', error);
+						},
+					});
+				});			
+			});
+			
+			function create_account() {
+				if (confirmed == true) {
+					$.ajax({
+						dataType: 'json',
+
+						url: 'http://212.233.76.232:443/post_method',
+						type: 'POST', 
+						contentType: 'application/json', 
+						data: JSON.stringify({
+							user_side_data: {
+								operation_type: 'Create user',
+								user_data: {
+									login: $('#new-login').val(),
+									password: $('#new-password').val(),
+								},
+							},
+						}),
+
+						success: function(response) {
+							if (response['response'] == 'User created') {
+								window.location.replace("../index.html");
+							}
+					  
+							if (response['response'] == 'Wrong login') {
+								alert('Некорректный логин либо логин уже занят');
+							}
+						
+							if (response['response'] == 'Wrong password') {
+								alert('Пароль должен иметь длину более 8 символов и содержать цифры и буквы');
+							}
+						},
+						
+						error: function(error) {
+							console.error('Error: ', error);
+						},
+					});
+			  }
+			}
+
+			function onClick(e) {
+				e.preventDefault();
+				grecaptcha.enterprise.ready(async () => {
+					const token = await grecaptcha.enterprise.execute('6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif', {action: 'LOGIN'});
+					sendTokenToServer(token);
+				});
+			}
+		  
+			function sendTokenToServer(token) {
+				$.ajax({
+					url: 'https://recaptchaenterprise.googleapis.com/v1/projects/cordellconfirm-1701784717992/assessments?key=6LfvAycpAAAAAJyS8EsUEGpLeIr-1stusIKpaXR2',
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify({ event: {
+						token: token,
+						expectedAction: 'action',
+						siteKey: '6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif',
+					}}),
+					
+					success: function(response) {
+						alert(response);
+					},
+						
+					error: function(error) {
+						console.error('Error: ', error);
+					},
+				});
+			}
+		</script>
+		
+		<footer>
+			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+		</footer>
+	</body>
+</html>
+

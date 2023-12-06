@@ -1,0 +1,93 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <title> Главная </title>
+	
+    <link rel="stylesheet" href="styles.css">
+	<script src="/scripts/user.js"></script>
+</head>
+	<body>
+
+		<header>
+			<h1 id="welcome-message"> Добро пожаловать, Гость! </h1>
+			<nav>
+				<ul id="navigation-list">
+					<li><a href="index.html"> Главная </a></li>
+					<li><a href="/pages/about.html"> О нас </a></li>
+					<li><a href="/pages/contacts.html"> Контакты </a></li>
+				</ul>
+			</nav>
+			
+			<div class="auth-buttons" style="styles.css">
+				<button id="authButton" onclick="redirect_login()"> Авторизоваться </button>
+				<button id="createButton" onclick="redirect_signup()"> Создать аккаунт </button>
+			</div>
+		</header>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var storedUser = localStorage.getItem('current_user');
+
+				if (storedUser) {
+					var currentUser = JSON.parse(storedUser);
+					updateWelcomeMessage(currentUser.login);
+					
+					document.getElementById("authButton").innerText = "Сменить аккаунт";
+					
+					document.getElementById("createButton").innerText = "Выйти";
+					document.getElementById("createButton").onclick = exit_user;
+				}
+			});
+			
+			function exit_user() {
+				localStorage.clear();
+				window.location.href = 'index.html';
+			}
+
+			function updateWelcomeMessage(username) {
+				var welcomeMessage = document.getElementById('welcome-message');
+				welcomeMessage.textContent = 'Добро пожаловать, ' + username + '!';
+			}
+		
+			function redirect_signup() {
+				window.location.href = '/pages/signup.html';
+			}
+			
+			function redirect_login() {
+				window.location.href = '/pages/login.html';
+			}
+		</script>
+
+		<main>
+			<section id="home">
+				<div class="hero">
+					<h2 class="welcome-heading"> Добро пожаловать в Cordell Education </h2>
+					<p class="intro-text"> Cordell Education — ваш надежный партнер в обеспечении успеха в академической сфере. Мы стремимся создать инновационное образовательное пространство, в котором каждый студент может раскрыть свой потенциал. </p>
+				</div>
+				<div class="advantages">
+					<h3 class="advantages-heading"> Наши ключевые преимущества: </h3>
+					<ul class="advantages-list">
+						<li class="advantage"> Профессиональные авторы: Команда Cordell Education состоит из опытных специалистов, готовых предложить высококачественные услуги по написанию курсовых работ, статей и других научных трудов. </li>
+						<li class="advantage"> Индивидуальный подход: Мы понимаем, что каждый студент уникален. Наши авторы готовы адаптировать свой подход к вашим потребностям и требованиям вашего учебного заведения. </li>
+						<li class="advantage"> Широкий спектр услуг: Cordell Education предоставляет не только услуги по написанию курсовых работ, но и помощь в подготовке научных статей, патентов, и других видов научных трудов. </li>
+						<li class="advantage"> Качество и сроки: Мы гарантируем высокое качество предоставляемых услуг и стремимся к соблюдению сроков выполнения заказов. </li>
+					</ul>
+				</div>
+				<div class="conclusion">
+					<p class="conclusion-text"> Выберите Cordell Education для успешного завершения вашего учебного процесса. Мы готовы быть вашими гидами в мире знаний и науки. </p>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+		</footer>
+
+	</body>
+</html>
+

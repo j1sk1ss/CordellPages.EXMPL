@@ -39,7 +39,7 @@
 					<button id="signupButton" onclick="submitForm()" type="button" disabled="disabled"> Создать аккаунт </button>
 				</form>
 				
-				<form id="captchaForm" method="POST" action="http://212.233.76.232:443/captcha">
+				<form id="captchaForm" method="POST" action="https://212.233.76.232:443/captcha">
 					<div class="g-recaptcha" data-sitekey="6LfvAycpAAAAAAMuClBB8cInJC2-Ur669NIBPvdy"></div>
 					<br/>
 					
@@ -59,7 +59,7 @@
 			var headers = new Headers();
 			headers.append('Content-Type', 'application/json');
 
-			fetch('http://212.233.76.232:443/captcha', {
+			fetch('https://212.233.76.232:5000/captcha', {
 				method: 'POST',
 				headers: headers,
 				body: JSON.stringify(Object.fromEntries(formData)),
@@ -83,7 +83,7 @@
 				$.ajax({
 					dataType: 'json',
 				  
-					url: 'http://212.233.76.232:443/mail_confirm',
+					url: 'https://212.233.76.232:5000/mail_confirm',
 					type: 'POST', 
 					contentType: 'application/json', 
 					data: JSON.stringify({
@@ -113,7 +113,7 @@
 				$.ajax({
 					dataType: 'json',
 				  
-					url: 'http://212.233.76.232:443/code_confirm',
+					url: 'https://212.233.76.232:5000/code_confirm',
 					type: 'POST', 
 					contentType: 'application/json', 
 					data: JSON.stringify({
@@ -144,7 +144,7 @@
 				$.ajax({
 					dataType: 'json',
 
-					url: 'http://212.233.76.232:443/register',
+					url: 'https://212.233.76.232:5000/register',
 					type: 'POST', 
 					contentType: 'application/json', 
 					data: JSON.stringify({

@@ -18,8 +18,11 @@
 			<section id="loginForm">
 				<h2> Вход в аккаунт </h2>
 				<form id="signupForm">
-					<label for="login"> Логин: </label>
-					<input type="text" id="login" name="login" required autocomplete="username">
+					<label id="mail-lable" for="mail"> Почта: </label>
+					<input type="text" id="mail" name="mail" required autocomplete="user-mail">
+					
+					<button id="mailCheckButton" type="button"> Проверка почты </button>
+					<button id="codeCheckButton" type="button" hidden="hidden"> Подтвердить код </button>
 					
 					<label for="password"> Пароль: </label>
 					<input type="password" id="password" name="password" required autocomplete="current-password">
@@ -33,42 +36,107 @@
 		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 		<script src="../scripts/user.js"></script>
 		<script>
-		  $(document).ready(function() {
-			$('#loginButton').on('click', function() {
-			  $.ajax({
-				dataType: 'json',
-			  
-				url: 'http://212.233.76.232:443/post_method',
-				type: 'POST', 
-				contentType: 'application/json', 
-				data: JSON.stringify({
-					user_side_data: {
-					  operation_type: 'Login user',
-					  user_data: {
-						login: $('#login').val(),
-						password: $('#password').val(),
-					  },
-					},
-				}),
-
-				success: function(response) {
-				  console.log('Login successful:', response);
-				  if (response['response'] == 'Succes login') {
-						registerUser(response['user']['user_name'], response['user']['admin']);
-						window.location.replace("http://212.233.76.232/");
-				  }
+		let confirmed = false;
+		let mail = '';
+		
+		$(document).ready(function() {
+			$('#mailCheckButton').on('click', function() {
+				mail = $('#mail').val();
+				$.ajax({
+					dataType: 'json',
 				  
-				  if (response['response'] == 'Wrong password') {
-						$('#status').text('Ошибка в логине или пароле');
-				  }
-				},
-				error: function(error) {
-				  console.error('Error login:', error);
-				  $('#status').text(response['response']);
-				},
-			  });
+					url: 'http://212.233.76.232:443/mail_confirm',
+					type: 'POST', 
+					contentType: 'application/json', 
+					data: JSON.stringify({
+						data: {
+							operation_type: 'Generate code',
+							mail: $('#mail').val()
+						},
+					}),
+
+					success: function(response) {
+						alert(response['response']);
+						
+						document.getElementById('mail').value = '';
+						document.getElementById('mail-lable').textContent = 'Код:';
+						
+						document.getElementById('codeCheckButton').removeAttribute("hidden");					
+						document.getElementById('mailCheckButton').setAttribute("hidden", "hidden");
+					},
+					error: function(error) {
+						console.error('Error: ', error);
+					},
+				});
 			});
-		  });
+			
+			$('#codeCheckButton').on('click', function() {
+				$.ajax({
+					dataType: 'json',
+				  
+					url: 'http://212.233.76.232:443/code_confirm',
+					type: 'POST', 
+					contentType: 'application/json', 
+					data: JSON.stringify({
+						data: {
+							operation_type: 'Confirm code',
+							code: $('#mail').val(),
+							mail: mail,
+						},
+					}),
+
+					success: function(response) {
+						alert(response['response']);
+						if (response['response'] == 'Mail verified') {
+							confirmed = true;
+						}
+					},
+					
+					error: function(error) {
+						console.error('Error: ', error);
+					},
+				});
+			});			
+		});
+		
+		$(document).ready(function() {
+			$('#loginButton').on('click', function() {
+				if (confirmed == true) {
+					$.ajax({
+						dataType: 'json',
+				  
+						url: 'http://212.233.76.232:443/login',
+						type: 'POST', 
+						contentType: 'application/json', 
+						data: JSON.stringify({
+							user_side_data: {
+								operation_type: 'Login user',
+								user_data: {
+									login: $('#login').val(),
+									mail: mail,
+									password: $('#password').val(),
+								},
+							},
+						}),
+
+						success: function(response) {
+							if (response['response'] == 'Succes login') {
+								registerUser(response['user']['user_name'], response['user']['admin']);
+								window.location.replace("http://212.233.76.232/");
+							}
+					  
+							if (response['response'] == 'Wrong password') {
+								alert('Ошибка в логине или пароле');
+							}
+						},
+						
+						error: function(error) {
+							console.error('Error login:', error);
+						},
+					});
+				}
+			});
+		});
 		</script>
 		
 		<footer>

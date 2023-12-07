@@ -24,7 +24,7 @@
 				<h2> Создание аккаунта </h2>
 				
 				<form id="signupForm">
-					<label for="new-login"> Новый логин: </label>
+					<label for="new-login"> Логин: </label>
 					<input type="text" id="new-login" name="new-login" required>
 					
 					<label for="mail" id="mail-lable"> Почта: </label>
@@ -33,10 +33,10 @@
 					<button id="mailConfirmButton" type="button"> Подтвердить почту </button>
 					<button id="codeConfirmButton" type="button" hidden="hidden"> Подтвердить код </button>
 					
-					<label for="new-password"> Новый пароль: </label>
+					<label for="new-password"> Пароль: </label>
 					<input type="password" id="new-password" name="new-password" required>
 					
-					<button id="signupButton" onclick="submitForm()" type="button"> Создать аккаунт </button>
+					<button id="signupButton" onclick="submitForm()" type="button" disabled="disabled"> Создать аккаунт </button>
 				</form>
 				
 				<form id="captchaForm" method="POST" action="http://212.233.76.232:443/captcha">
@@ -51,157 +51,162 @@
 		</main>
 		
 		<script>
-			let confirmed = false;
-			let captcha = false;
-			let mail = '';
-		
-			function submitForm() {
-				var formData = new FormData(document.getElementById('captchaForm'));
-				var headers = new Headers();
-				headers.append('Content-Type', 'application/json');
+		let confirmed = false;
+		let mail = '';
+	
+		function submitForm() {
+			var formData = new FormData(document.getElementById('captchaForm'));
+			var headers = new Headers();
+			headers.append('Content-Type', 'application/json');
 
-				fetch('http://212.233.76.232:443/captcha', {
-					method: 'POST',
-					headers: headers,
-					body: JSON.stringify(Object.fromEntries(formData)),
-				})
-				.then(response => response.json())
-				.then(data => {
-					if (data['response'] == 'Captcha solved') {
-						captcha = true;
-						create_account();
-					}
-				})
-				.catch(error => console.error('Error: ', error););
-			}
-		
-			$(document).ready(function() {
-				$('#mailConfirmButton').on('click', function() {
-					mail = $('#mail').val();
-					$.ajax({
-						dataType: 'json',
-					  
-						url: 'http://212.233.76.232:443/mail_confirm',
-						type: 'POST', 
-						contentType: 'application/json', 
-						data: JSON.stringify({
-							data: {
-								operation_type: 'Generate code',
-								mail: $('#mail').val()
-							},
-						}),
+			fetch('http://212.233.76.232:443/captcha', {
+				method: 'POST',
+				headers: headers,
+				body: JSON.stringify(Object.fromEntries(formData)),
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data['response'] == 'Captcha solved') {
+					create_account();
+				}
+				else {
+					alert('Капча не пройдена');
+					document.getElementById('captchaForm').reset();
+				}
+			})
+			.catch(error => console.error('Error: ', error));
+		}
+	
+		$(document).ready(function() {
+			$('#mailConfirmButton').on('click', function() {
+				mail = $('#mail').val();
+				$.ajax({
+					dataType: 'json',
+				  
+					url: 'http://212.233.76.232:443/mail_confirm',
+					type: 'POST', 
+					contentType: 'application/json', 
+					data: JSON.stringify({
+						data: {
+							operation_type: 'Generate code',
+							mail: $('#mail').val()
+						},
+					}),
 
-						success: function(response) {
-							alert(response['response']);
-							
+					success: function(response) {
+						alert(response['response']);
+						if (response['response'] != 'Bad mail') {
 							document.getElementById('mail').value = '';
 							document.getElementById('mail-lable').textContent = 'Код:';
-							
-							document.getElementById('codeConfirmButton').removeAttribute("hidden");					
+						
+							document.getElementById('codeConfirmButton').removeAttribute("hidden");
 							document.getElementById('mailConfirmButton').setAttribute("hidden", "hidden");
-						},
-						error: function(error) {
-							console.error('Error: ', error);
-						},
-					});
-				});
-				
-				$('#codeConfirmButton').on('click', function() {
-					$.ajax({
-						dataType: 'json',
-					  
-						url: 'http://212.233.76.232:443/mail_confirm',
-						type: 'POST', 
-						contentType: 'application/json', 
-						data: JSON.stringify({
-							data: {
-								operation_type: 'Confirm code',
-								code: $('#mail').val(),
-								mail: mail,
-							},
-						}),
-
-						success: function(response) {
-							alert(response['response']);
-							if (response['response'] == 'Mail verified') {
-								confirmed = true;
-							}
-						},
-						
-						error: function(error) {
-							console.error('Error: ', error);
-						},
-					});
-				});			
-			});
-			
-			function create_account() {
-				if (confirmed == true) {
-					$.ajax({
-						dataType: 'json',
-
-						url: 'http://212.233.76.232:443/post_method',
-						type: 'POST', 
-						contentType: 'application/json', 
-						data: JSON.stringify({
-							user_side_data: {
-								operation_type: 'Create user',
-								user_data: {
-									login: $('#new-login').val(),
-									password: $('#new-password').val(),
-								},
-							},
-						}),
-
-						success: function(response) {
-							if (response['response'] == 'User created') {
-								window.location.replace("../index.html");
-							}
-					  
-							if (response['response'] == 'Wrong login') {
-								alert('Некорректный логин либо логин уже занят');
-							}
-						
-							if (response['response'] == 'Wrong password') {
-								alert('Пароль должен иметь длину более 8 символов и содержать цифры и буквы');
-							}
-						},
-						
-						error: function(error) {
-							console.error('Error: ', error);
-						},
-					});
-			  }
-			}
-
-			function onClick(e) {
-				e.preventDefault();
-				grecaptcha.enterprise.ready(async () => {
-					const token = await grecaptcha.enterprise.execute('6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif', {action: 'LOGIN'});
-					sendTokenToServer(token);
-				});
-			}
-		  
-			function sendTokenToServer(token) {
-				$.ajax({
-					url: 'https://recaptchaenterprise.googleapis.com/v1/projects/cordellconfirm-1701784717992/assessments?key=6LfvAycpAAAAAJyS8EsUEGpLeIr-1stusIKpaXR2',
-					type: 'POST',
-					contentType: 'application/json',
-					data: JSON.stringify({ event: {
-						token: token,
-						expectedAction: 'action',
-						siteKey: '6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif',
-					}}),
-					
-					success: function(response) {
-						alert(response);
+						}
 					},
-						
 					error: function(error) {
 						console.error('Error: ', error);
 					},
 				});
-			}
+			});
+			
+			$('#codeConfirmButton').on('click', function() {
+				$.ajax({
+					dataType: 'json',
+				  
+					url: 'http://212.233.76.232:443/code_confirm',
+					type: 'POST', 
+					contentType: 'application/json', 
+					data: JSON.stringify({
+						data: {
+							operation_type: 'Confirm code',
+							code: $('#mail').val(),
+							mail: mail,
+						},
+					}),
+
+					success: function(response) {
+						alert(response['response']);
+						if (response['response'] == 'Mail verified') {
+							confirmed = true;
+							document.getElementById('signupButton').removeAttribute("disabled");
+						}
+					},
+					
+					error: function(error) {
+						console.error('Error: ', error);
+					},
+				});
+			});			
+		});
+		
+		function create_account() {
+			if (confirmed == true) {
+				$.ajax({
+					dataType: 'json',
+
+					url: 'http://212.233.76.232:443/register',
+					type: 'POST', 
+					contentType: 'application/json', 
+					data: JSON.stringify({
+						user_side_data: {
+							operation_type: 'Create user',
+							user_data: {
+								login: $('#new-login').val(),
+								mail: mail,
+								password: $('#new-password').val(),
+							},
+						},
+					}),
+
+					success: function(response) {
+						if (response['response'] == 'User created') {
+							window.location.replace("../index.html");
+						}
+				  
+						if (response['response'] == 'Wrong login') {
+							alert('Некорректный логин либо логин уже занят');
+						}
+					
+						if (response['response'] == 'Wrong password') {
+							alert('Пароль должен иметь длину более 8 символов и содержать цифры и буквы');
+						}
+					},
+					
+					error: function(error) {
+						console.error('Error: ', error);
+					},
+				});
+		  }
+		}
+
+		function onClick(e) {
+			e.preventDefault();
+			grecaptcha.enterprise.ready(async () => {
+				const token = await grecaptcha.enterprise.execute('6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif', {action: 'LOGIN'});
+				sendTokenToServer(token);
+			});
+		}
+	  
+		function sendTokenToServer(token) {
+			$.ajax({
+				url: 'https://recaptchaenterprise.googleapis.com/v1/projects/cordellconfirm-1701784717992/assessments?key=6LfvAycpAAAAAJyS8EsUEGpLeIr-1stusIKpaXR2',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ event: {
+					token: token,
+					expectedAction: 'action',
+					siteKey: '6LcATiUpAAAAAAPZ5RsydPgFM7sMF22jj4_kgTif',
+				}}),
+				
+				success: function(response) {
+					alert(response);
+				},
+					
+				error: function(error) {
+					console.error('Error: ', error);
+				},
+			});
+		}
 		</script>
 		
 		<footer>

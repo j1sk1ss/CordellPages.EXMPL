@@ -20,9 +20,14 @@
 		</header>
 
 		<main>
+			<style>
+				#backGroundLogo {
+					height: 400px;
+					width: auto;
+				}
+			</style>
+		
 			<section id="signup-form">
-				<h2> Создание аккаунта </h2>
-				
 				<form id="signupForm">
 					<label for="new-login"> Логин: </label>
 					<input type="text" id="new-login" name="new-login" required>
@@ -40,12 +45,13 @@
 				</form>
 				
 				<form id="captchaForm" method="POST" action="https://212.233.76.232:443/captcha">
-					<div class="g-recaptcha" data-sitekey="6LfvAycpAAAAAAMuClBB8cInJC2-Ur669NIBPvdy"></div>
+					<div id="captchaDiv" hidden="hidden" class="g-recaptcha" data-sitekey="6LfvAycpAAAAAAMuClBB8cInJC2-Ur669NIBPvdy"></div>
 					<br/>
 					
 					<input type="submit" value="Submit" id="submitButton" style="display: none;">
 				</form>
 
+				<div id="underlyingBackground"></div>
 				<p id="status"></p>
 			</section>
 		</main>
@@ -128,6 +134,7 @@
 						alert(response['response']);
 						if (response['response'] == 'Mail verified') {
 							confirmed = true;
+							document.getElementById('captchaDiv').removeAttribute("hidden");
 							document.getElementById('signupButton').removeAttribute("disabled");
 						}
 					},

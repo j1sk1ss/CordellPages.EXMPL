@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title> Администрация </title>
+        <link rel="icon" href="images/MainLogo.ico" type="image/x-icon">
+		
+		<link rel="stylesheet" href="../styles.css">
+		<script src="../scripts/user.js"></script>
+	</head>
+
+	<body>
+        <header>
+            <h1 id="welcome-message"> Администрация </h1>
+            <nav>
+                <ul id="navigation-list">
+                    <li><a href="../index.html"> Главная </a></li>
+                    <li><a href="/pages/about.html"> О нас </a></li>
+                    <li><a href="/pages/contacts.html"> Контакты </a></li>
+                </ul>
+            </nav>
+
+            <style>
+                body {
+                    font-family: 'Arial', sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f4f4f4;
+                }
+        
+                header {
+                    background-color: #333;
+                    color: #fff;
+                    padding: 1em 0;
+                    text-align: center;
+                }
+        
+                nav ul {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    justify-content: center;
+                }
+        
+                nav ul li {
+                    margin: 0 15px;
+                }
+        
+                main {
+                    max-width: 800px;
+                    margin: 20px auto;
+                    padding: 20px;
+                    background-color: #fff;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    border-radius: 8px;
+                }
+        
+                h1 {
+                    color: #ffffff;
+                }
+        
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+        
+                th, td {
+                    border: 1px solid #ddd;
+                    padding: 12px;
+                    text-align: left;
+                }
+        
+                th {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+        
+                ul {
+                    list-style: none;
+                    padding: 0;
+                }
+        
+                #admin-functionality {
+                    margin-top: 20px;
+                }
+        
+                label {
+                    display: block;
+                    margin-top: 10px;
+                    color: #ffffff;
+                }
+        
+                input {
+                    padding: 10px;
+                    width: 100%;
+                    box-sizing: border-box;
+                    margin-bottom: 10px;
+                }
+        
+                button {
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 10px 15px;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 16px;
+                    border-radius: 10px;
+                }
+        
+                footer {
+                    background-color: #333;
+                    color: #fff;
+                    text-align: center;
+                    padding: 1em 0;
+                    position: fixed;
+                    bottom: 0;
+                    width: 100%;
+                }
+            </style>
+        </header>
+
+        <script>
+            async function fetchUserData() {
+                try {
+                    const response = await fetch('https://212.233.76.232:5000/api/users-list');
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    return [];
+                }
+            }
+
+            async function fetchOnlineUsers() {
+                try {
+                    const response = await fetch('https://212.233.76.232:5000/api/count-users');
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching online users:', error);
+                    return [];
+                }
+            }
+
+            async function populateUserTable() {
+                var userTableBody = document.getElementById("user-table-body");
+
+                const users = await fetchUserData();
+                const onlineUsers = await fetchOnlineUsers();
+
+                userTableBody.innerHTML = "";
+
+                users['response'].forEach(function (user) {
+                    var row = document.createElement("tr");
+                    row.innerHTML = `<td>${user["login"]}</td><td>${user["mail"]}</td>`;
+                    userTableBody.appendChild(row);
+                });
+
+                document.getElementById("online-users").innerText = "Пользователей на сайте: " + onlineUsers["response"];
+            }
+
+            async function addAdministrator() {
+                var newAdminEmailInput = document.getElementById("new-admin-email");
+                var newAdminEmail = newAdminEmailInput.value;
+
+                const jwtToken = localStorage.getItem('admin_token');
+                const newAdmin = { mail: newAdminEmail };
+                await fetch('https://212.233.76.232:5000/api/add-admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify(newAdmin),
+                });
+
+                newAdminEmailInput.value = "";
+            }
+
+            async function deleteAdministrator() {
+                var newAdminEmailInput = document.getElementById("new-admin-email");
+                var newAdminEmail = newAdminEmailInput.value;
+
+                const jwtToken = localStorage.getItem('admin_token');
+                const newAdmin = { mail: newAdminEmail };
+                await fetch('https://212.233.76.232:5000/api/delete-admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify(newAdmin),
+                });
+
+                newAdminEmailInput.value = "";
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                populateUserTable();
+            });
+        </script>
+
+        <main>
+            <section id="user-table">
+                <h2>Список пользователей</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="user-table-body"></tbody>
+                </table>
+            </section>
+
+            <section id="online-users">
+                <h2 id="online-users">Онлайн пользователи</h2>
+            </section>
+
+            <section id="admin-functionality">
+                <h2>Управление администраторами</h2>
+                <label for="new-admin-email">Email нового администратора:</label>
+                <input type="email" id="new-admin-email" required>
+
+                <button onclick="addAdministrator()">Добавить администратора</button>
+                <button onclick="deleteAdministrator()">Удалить администратора</button>
+            </section>
+        </main>		
+
+        <br>
+        <br>
+        <br>
+        <br>
+
+		<footer>
+			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+		</footer>
+	</body>
+</html>
+

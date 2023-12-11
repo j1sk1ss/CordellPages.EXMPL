@@ -2,17 +2,54 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+    	<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-    <title> Главная </title>
+    	<title> Главная - Cordell Pages </title>
+		<link rel="icon" href="pages/images/MainLogo.ico" type="image/x-icon">
 	
-    <link rel="stylesheet" href="styles.css">
-	<script src="/scripts/user.js"></script>
-</head>
-	<body>
+    	<link rel="stylesheet" href="styles.css">
+		<script src="/scripts/user.js"></script>
 
+		<style>
+			.hero {
+				position: relative;
+			}
+
+			.hero img {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				filter: blur(5px); /* Задаем степень размытия */
+				opacity: 0.3; /* Задаем степень прозрачности */
+				z-index: 0; /* Помещаем изображение под текст */
+			}
+
+			.welcome-heading,
+			.intro-text {
+				z-index: 1; /* Помещаем текст над изображением */
+			}
+
+			/* Дополнительные стили для красивого оформления текста */
+			.welcome-heading {
+				color: #fff;
+				font-size: 2em;
+			}
+
+			.intro-text {
+				color: #fff;
+				font-size: 1.2em;
+				max-width: 600px; /* Ограничиваем ширину текста */
+				margin: 0 auto; /* Центрируем текст */
+			}
+		</style>
+	</head>
+
+	<body>
 		<header>
 			<h1 id="welcome-message"> Добро пожаловать, Гость! </h1>
 			<nav>
@@ -20,6 +57,7 @@
 					<li><a href="index.html"> Главная </a></li>
 					<li><a href="/pages/about.html"> О нас </a></li>
 					<li><a href="/pages/contacts.html"> Контакты </a></li>
+					<li><a id="admin_item" href="/pages/admin.html" style="display: none;"> Управление </a></li>
 				</ul>
 			</nav>
 			
@@ -41,6 +79,11 @@
 					
 					document.getElementById("createButton").innerText = "Выйти";
 					document.getElementById("createButton").onclick = exit_user;
+				}
+
+				loadCurrentUser();
+				if (current_user.admin_status == 1) {
+					document.getElementById("admin_item").style.display = "block";
 				}
 			});
 			
@@ -66,23 +109,289 @@
 		<main>
 			<section id="home">
 				<div class="hero">
-					<h2 class="welcome-heading"> Добро пожаловать в Cordell Education </h2>
-					<p class="intro-text"> Cordell Education — ваш надежный партнер в обеспечении успеха в академической сфере. Мы стремимся создать инновационное образовательное пространство, в котором каждый студент может раскрыть свой потенциал. </p>
+					<img src="pages/images/MainLogo.png">
+					<h2 class="welcome-heading">Добро пожаловать в Cordell IT</h2>
+					<p class="intro-text"> 
+						<span style="color: green;">Cordell</span> — это не просто****** команда или компания. 
+						<span style="color: green;">Cordell</span> - это всё. А всё - это <span style="color: green;">Cordell.</span>
+					</p>
 				</div>
+				
 				<div class="advantages">
 					<h3 class="advantages-heading"> Наши ключевые преимущества: </h3>
 					<ul class="advantages-list">
-						<li class="advantage"> Профессиональные авторы: Команда Cordell Education состоит из опытных специалистов, готовых предложить высококачественные услуги по написанию курсовых работ, статей и других научных трудов. </li>
-						<li class="advantage"> Индивидуальный подход: Мы понимаем, что каждый студент уникален. Наши авторы готовы адаптировать свой подход к вашим потребностям и требованиям вашего учебного заведения. </li>
-						<li class="advantage"> Широкий спектр услуг: Cordell Education предоставляет не только услуги по написанию курсовых работ, но и помощь в подготовке научных статей, патентов, и других видов научных трудов. </li>
-						<li class="advantage"> Качество и сроки: Мы гарантируем высокое качество предоставляемых услуг и стремимся к соблюдению сроков выполнения заказов. </li>
+						<li class="advantage"> Покрытие почти всех необходимых средне-статистическому человеку нужд от пищи до развлечений. </li>
+						<li class="advantage"> Конкурентная* заработная плата для новых сотрудников. </li>
+						<li class="advantage"> Высокое** качество всей выпускаемой продукции. </li>
+						<li class="advantage"> Следование трендам, современным течениям и идеям этого******* времени. </li>
 					</ul>
 				</div>
+				
+				<br>
+				<br>
+				<br>
+				<br>
+				
+				<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+				<script>
+					$(document).ready(function() {
+						var hiddenContent = $(this).find(".hidden-content");
+						hiddenContent.slideToggle();
+					
+						$(".expandable-block").click(function() {
+							var hiddenContent = $(this).find(".hidden-content");
+							hiddenContent.slideToggle();
+						});
+					});
+				</script>
+					
+				<style>
+					.image-text-container {
+						display: flex;
+						border-radius: 10px;
+						overflow: hidden;
+						box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Добавим тень для контейнера */
+						transition: transform 0.3s ease;
+					}
+					
+					.image-text-container:hover {
+						transform: scale(0.95); /* Increase the scale on hover */
+					}
+
+					.image-text-container img {
+						border-radius: 10px;
+						max-width: 100%;
+						height: 400px;
+						width: 600px;
+					}
+
+					.image-text-container div {
+						flex: 1;
+						border-radius: 0 10px 10px 0;
+					}
+					
+					.text-container div {
+						flex: 1;
+						border-radius: 0 10px 10px 0;
+					}
+
+					.text-content {
+						padding: 20px;
+						background-color: #f8f8f8; /* Изменим цвет фона на более светлый */
+						flex: 1;
+					}
+
+					.text-content p {
+						margin-bottom: 10px;
+						color: #333; /* Изменим цвет текста */
+					}
+
+					.text-content a {
+						color: #4CAF50; /* Изменим цвет ссылок */
+					}
+
+					.image-text-block {
+						margin-bottom: 40px; /* Увеличим отступ между блоками */
+					}
+
+					.disclaimer {
+						font-size: small;
+						opacity: 0.7;
+						margin-top: 20px; /* Добавим отступ сверху */
+					}
+				</style>
+				
+				<h2 class="welcome-heading"> Продукция <span style="color: green;"> Cordell </span> IT </h2>
+
+				<div class="image-text-block expandable-block">
+					<div class="image-text-container">
+						<img src="pages/images/CordellOS.jpg" alt="Операционная система Cordell OS">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Cordell OS </h2>
+							<p>Операционная система <span style="color: green;">Cordell</span> OS предназначена для абсолютно нового опыта пользования Персональным Компьютером (в частности <span style="color: green;">Cordell</span> PC). Красивейший дизайн и полное отсутствие конкурентов делает из этого продукта то, чем он является и по сей день.</p>
+							<a href="https://github.com/j1sk1ss/CordellOS.PETPRJ"> Официальный репозиторий </a>
+						</div>
+					</div>
+					
+					<div class="hidden-content">
+						
+						<div class="text-container">
+							<div class="text-content">
+								<p> 
+
+									CordellOS.MPRJ
+									This repository contains my attempts to build my own computer from scratch. This ReadME will contain all the information about this project, and this is where we will begin.
+
+									Main idea
+									The main idea, as you might guess, is to create my own computer (case, motherboard and OS), primarily in order to gain experience in low-level programming, engineering design, and, as an option, in design.
+
+									Well, what to hide, I also wanted to come to the university with this work of art and try to pass at least some work on it...
+
+									Start of proccess
+									It all started with the idea of creating my own operating system to practice C and ASM skills. As a basis for my study, I chose a tutorial from nanobyte (links to all sources will be presented below) and the OsDev website.
+
+									Then, reaching the current end of the tutorial (currently 11/3/2023, video still in production), I completed the basic file system functions, integrated a simple ASM compiler with a simple shell language, and began selecting the case and board.
+
+								</p>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+
+				<div class="image-text-block expandable-block">
+					<div class="image-text-container">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Cordell Engine </h2>
+							<p>
+								3D движёк и 3D редактор <span style="color: green;">Cordell</span> Engine и 
+								<span style="color: green;">Cordell</span> 
+								Editor соответсвенно представлены для работы с 3D объектами прямиком из Cordell 
+								IT предоставляет полный функционал и инструментарий для воплощения всех*** идей в реальность****
+								посредством манипуляций с 3D пространством.
+							</p>
+							<a href="https://github.com/j1sk1ss/CordellEngine.PETPRJ"> Официальный репозиторий </a>
+						</div>
+						<img src="pages/images/CordellEditor.jpg" alt="Cordell Editor">
+					</div>
+					
+					<div class="hidden-content">
+						<div class="text-container">
+							<div class="text-content">
+								<p> 
+									Simple library for implementing 3D graphics anywhere
+
+									UI based editor that working on rhis library u can see below this link https://github.com/j1sk1ss/CordellEditor.EXMPL
+
+									Simple creation of objects
+									  var space = new Space(new ChromeCamera(new Vector3(-4,0,0), new Vector3(0)), 
+										  new List {
+											  new Sphere(new Vector3(0, 3, 0), new Vector3(1), Material.DefaultMaterial, "sphere_1"),
+											  new Sphere(new Vector3(0, -3, 0), new Vector3(1), Material.DefaultMaterial, "sphere_2"),
+											  new Light(new Vector3(-1, 0, -1), 1, "light1_1")
+										  });
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="image-text-block expandable-block">
+					<div class="image-text-container">
+						<img src="pages/images/FotNET.jpg" alt="Операционная система Cordell OS">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Cordell FotNET </h2>
+							<p> 
+								Библиотека для работы с нейронныи сетями и моделями. Отличительной чертой можно отметить синтаксис C#, 
+								наличие CNN, RNN (OtM, MtM, MtO, OtO), FNN, GAN, R-CNN 
+							</p>
+							<a href="https://github.com/j1sk1ss/FotNET.PETPRJ"> Официальный репозиторий </a>
+						</div>
+					</div>
+					
+					<div class="hidden-content">
+						<div class="text-container">
+							<div class="text-content">
+								<p> 
+									FotNET is a simple library for working with REGIONAL-CONVOLUTION, RECURRENT, GENERATIVE-ADVERSARIAL, 
+									CONVOLUTION and CLASSIC NEURAL NETWORKS like PERCEPTRON. The main part is that u can create ur own 
+									neural network without libraries that takes all work. This project is open source and u can see a 
+									code, download him and change every part what u need cuz it very simple to understand this project 
+									with xml documentation.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="image-text-block">
+					<div class="image-text-container">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Cordell Shedule </h2>
+							<p> 
+								Вам когда нибудь надоедало проверять расписание? Или скачивать дополнительное приложение для 
+								"более" удобного ознакомления с последним? Это время прошло, ведь благодаря этому боту вам более 
+								не придётся тратить и секунды на такое утомляющее дело как проверка рассписания. 
+							</p>
+							<a href="https://github.com/j1sk1ss/CordellSchedule.EXMPL"> Официальный репозиторий </a>
+						</div>
+						<img src="pages/images/CordellSheduler.jpg" alt="Cordell Shedule">
+					</div>
+				</div>
+
+				<div class="image-text-block">
+					<div class="image-text-container">
+						<img src="pages/images/SvinNet.jpg" alt="Операционная система Cordell OS">
+						<div class="text-content">
+							<h2 class="welcome-heading"> SvinNET </h2>
+							<p> 
+								Библиотека для работы с нейронныи сетями и моделями, являющейся портом Cordell FotNET с C# на язык Java. 
+								Функционал менее обширен, и представляет из себя работу с FNN сетями 
+							</p>
+							<a href="https://github.com/AlexanderVinarsky/SvinNET">Официальный репозиторий</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="image-text-block">
+					<div class="image-text-container">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Cordell PC </h2>
+							<p> 
+								Абсолютно прорывной во всех смыслах дизайн не просто оставляет за собой конкурентов, а делает 
+								из последних смешное сборище. А наличие на борту высоко-производительной операционной системы Cordell 
+								OS так же не станет минусом. 
+							</p>
+							<a href="https://github.com/j1sk1ss/CordellOS.PETPRJ"> Официальный репозиторий </a>
+						</div>
+						<img src="pages/images/CordellPC.jpg" alt="Cordell PC">
+					</div>
+				</div>
+
+				<div class="image-text-block">
+					<div class="image-text-container">
+						<img src="pages/images/Corchan.jpg" alt="Операционная система Cordell OS">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Corchan </h2>
+							<p> 
+								Определённо лучший***** вариант для социального взаимодействия с другими сотрудниками Cordell inc.
+							</p>
+							<a href="https://github.com/AlexanderVinarsky/Corchan_Image_Board">Официальный репозиторий</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="image-text-block">
+					<div class="image-text-container">
+						<div class="text-content">
+							<h2 class="welcome-heading"> Cordell Pads </h2>
+							<p> 
+								Определённо единственный элемент внешнего вида, достойный к упоминанию. Именно данный аксессуар отделяет 
+								низшие, недостойные к жизни формы существования от таких же, но с частичкой власти и аутизма.
+							</p>
+						</div>
+						<img src="pages/images/CordellPads.jpg" alt="Cordell PC">
+					</div>
+				</div>
+
+				<div class="disclaimer">
+					<p>* - конкурентная среди филиалов <span style="color: green;">Cordell</span> inc., таких как Cordell Education, Cordell IT, Cordell Economy, Cordell Medicine, Cordell Space, Cordell Churches, Cordell Transport</p>
+					<p>** - высокая по оценкам специалистов из <span style="color: green;">Cordell</span> inc.</p>
+					<p>*** - при согласовании с руководством <span style="color: green;">Cordell</span> inc.</p>
+					<p>**** - виртуальную "реальность" </p>
+					<p>***** - в том числе и единственный </p>
+					<p>****** - на самом деле - просто </p>
+					<p>******* - если мы имеем в виду под "этим" временем 10 лет назад </p>
+				</div>
+				
+				<br>
+				<br>
+				<br>
 			</section>
 		</main>
 
 		<footer>
-			<p> &copy; 2023 Cordell inc. Все права защищены. </p>
+			<p> &copy; 2023 <span style="color: green;">Cordell</span> inc. Все права защищены. </p>
 		</footer>
 
 	</body>

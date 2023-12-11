@@ -9,6 +9,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		
 		<title> Регистрация </title>
+		<link rel="icon" href="images/MainLogo.ico" type="image/x-icon">
 		
 		<link rel="stylesheet" href="styles/signup.css">
 		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -44,8 +45,8 @@
 					<button id="signupButton" onclick="submitForm()" type="button" disabled="disabled"> Создать аккаунт </button>
 				</form>
 				
-				<form id="captchaForm" method="POST" action="https://212.233.76.232:443/captcha">
-					<div id="captchaDiv" hidden="hidden" class="g-recaptcha" data-sitekey="6LfvAycpAAAAAAMuClBB8cInJC2-Ur669NIBPvdy"></div>
+				<form id="captchaForm" method="POST" action="https://212.233.76.232:5000/api/captcha">
+					<div id="captchaDiv" class="g-recaptcha" data-sitekey="6LfvAycpAAAAAAMuClBB8cInJC2-Ur669NIBPvdy"></div>
 					<br/>
 					
 					<input type="submit" value="Submit" id="submitButton" style="display: none;">
@@ -56,6 +57,7 @@
 			</section>
 		</main>
 		
+		<script src="scripts/server.js"></script>
 		<script>
 		let confirmed = false;
 		let mail = '';
@@ -65,7 +67,7 @@
 			var headers = new Headers();
 			headers.append('Content-Type', 'application/json');
 
-			fetch('https://212.233.76.232:5000/captcha', {
+			fetch('https://212.233.76.232:5000/api/captcha', {
 				method: 'POST',
 				headers: headers,
 				body: JSON.stringify(Object.fromEntries(formData)),
@@ -84,66 +86,33 @@
 		}
 	
 		$(document).ready(function() {
-			$('#mailConfirmButton').on('click', function() {
-				mail = $('#mail').val();
-				$.ajax({
-					dataType: 'json',
-				  
-					url: 'https://212.233.76.232:5000/mail_confirm',
-					type: 'POST', 
-					contentType: 'application/json', 
-					data: JSON.stringify({
-						data: {
-							operation_type: 'Generate code',
-							mail: $('#mail').val()
-						},
-					}),
-
-					success: function(response) {
-						alert(response['response']);
-						if (response['response'] != 'Bad mail') {
-							document.getElementById('mail').value = '';
-							document.getElementById('mail-lable').textContent = 'Код:';
-						
-							document.getElementById('codeConfirmButton').removeAttribute("hidden");
-							document.getElementById('mailConfirmButton').setAttribute("hidden", "hidden");
-						}
-					},
-					error: function(error) {
-						console.error('Error: ', error);
-					},
+			$(document).ready(function() {
+				$('#mailConfirmButton').on('click', function() {
+					mail = $('#mail').val();
+					generate_code(mail)
+							.then(function (generated_code_status) {
+								if (generated_code_status == true) {
+									document.getElementById('mail').value = '';
+									document.getElementById('mail-lable').textContent = 'Код:';
+									document.getElementById('codeConfirmButton').removeAttribute("hidden");
+									document.getElementById('mailConfirmButton').setAttribute("hidden", "hidden");
+								}
+							})
+							.catch(function (error) {
+								console.error('Error:', error);
+							});
 				});
-			});
-			
-			$('#codeConfirmButton').on('click', function() {
-				$.ajax({
-					dataType: 'json',
-				  
-					url: 'https://212.233.76.232:5000/code_confirm',
-					type: 'POST', 
-					contentType: 'application/json', 
-					data: JSON.stringify({
-						data: {
-							operation_type: 'Confirm code',
-							code: $('#mail').val(),
-							mail: mail,
-						},
-					}),
-
-					success: function(response) {
-						alert(response['response']);
-						if (response['response'] == 'Mail verified') {
-							confirmed = true;
-							document.getElementById('captchaDiv').removeAttribute("hidden");
-							document.getElementById('signupButton').removeAttribute("disabled");
-						}
-					},
-					
-					error: function(error) {
-						console.error('Error: ', error);
-					},
-				});
-			});			
+				
+				$('#codeConfirmButton').on('click', function() {
+					send_code(mail, $('#mail').val())
+							.then(function(send_code_status) {
+								confirmed = send_code_status;
+								if (confirmed == true) {
+									document.getElementById('signupButton').removeAttribute("disabled");
+								}
+							})
+				});			
+			});	
 		});
 		
 		function create_account() {
@@ -151,7 +120,7 @@
 				$.ajax({
 					dataType: 'json',
 
-					url: 'https://212.233.76.232:5000/register',
+					url: 'https://212.233.76.232:5000/api/register',
 					type: 'POST', 
 					contentType: 'application/json', 
 					data: JSON.stringify({
@@ -166,24 +135,19 @@
 					}),
 
 					success: function(response) {
-						if (response['response'] == 'User created') {
+						if (response['response'] == 'User created') 
 							window.location.replace("../index.html");
-						}
-				  
-						if (response['response'] == 'Wrong login') {
+						else if (response['response'] == 'Wrong login') 
 							alert('Некорректный логин либо логин уже занят');
-						}
-					
-						if (response['response'] == 'Wrong password') {
+						else if (response['response'] == 'Wrong password') 
 							alert('Пароль должен иметь длину более 8 символов и содержать цифры и буквы');
-						}
 					},
 					
 					error: function(error) {
 						console.error('Error: ', error);
 					},
 				});
-		  }
+		  	}
 		}
 
 		function onClick(e) {

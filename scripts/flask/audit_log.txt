@@ -1,0 +1,3 @@
+2023-12-10 08:16:53: Admin with ID 12 is add admin with mail: amirov_2001@mail.ru
+2023-12-10 08:17:19: Admin with ID 12 is add admin with mail: dkaras2015@gmail.com
+2023-12-10 08:17:26: Admin with ID 12 is add admin with mail: zhora-gulin@mail.ru

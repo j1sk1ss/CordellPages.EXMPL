@@ -5,6 +5,7 @@
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	  
 	  <title> Регистрация </title>
+	  <link rel="icon" href="images/MainLogo.ico" type="image/x-icon">
 	  
 	  <link rel="stylesheet" href="styles/login.css">
 	</head>
@@ -35,108 +36,75 @@
 
 		<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 		<script src="../scripts/user.js"></script>
+		<script src="scripts/server.js"></script>
+
 		<script>
-		let confirmed = false;
-		let mail = '';
-		
-		$(document).ready(function() {
-			$('#mailCheckButton').on('click', function() {
-				mail = $('#mail').val();
-				$.ajax({
-					dataType: 'json',
-				  
-					url: 'https://212.233.76.232:5000/mail_confirm',
-					type: 'POST', 
-					contentType: 'application/json', 
-					data: JSON.stringify({
-						data: {
-							operation_type: 'Generate code',
-							mail: $('#mail').val()
-						},
-					}),
+			let confirmed = false;
+			let mail = '';
 
-					success: function(response) {
-						alert(response['response']);
-						
-						document.getElementById('mail').value = '';
-						document.getElementById('mail-lable').textContent = 'Код:';
-						
-						document.getElementById('codeCheckButton').removeAttribute("hidden");					
-						document.getElementById('mailCheckButton').setAttribute("hidden", "hidden");
-					},
-					error: function(error) {
-						console.error('Error: ', error);
-					},
+			$(document).ready(function() {
+				$('#mailCheckButton').on('click', function() {
+					mail = $('#mail').val();
+					generate_code(mail)
+							.then(function (generated_code_status) {
+								if (generated_code_status == true) {
+									document.getElementById('mail').value = '';
+									document.getElementById('mail-lable').textContent = 'Код:';
+									document.getElementById('codeCheckButton').removeAttribute("hidden");
+									document.getElementById('mailCheckButton').setAttribute("hidden", "hidden");
+								}
+							})
+							.catch(function (error) {
+								console.error('Error:', error);
+							});
 				});
+				
+				$('#codeCheckButton').on('click', function() {
+					send_code(mail, $('#mail').val())
+							.then(function(send_code_status) {
+								confirmed = send_code_status;
+							})
+				});			
 			});
-			
-			$('#codeCheckButton').on('click', function() {
-				$.ajax({
-					dataType: 'json',
-				  
-					url: 'https://212.233.76.232:5000/code_confirm',
-					type: 'POST', 
-					contentType: 'application/json', 
-					data: JSON.stringify({
-						data: {
-							operation_type: 'Confirm code',
-							code: $('#mail').val(),
-							mail: mail,
-						},
-					}),
 
-					success: function(response) {
-						alert(response['response']);
-						if (response['response'] == 'Mail verified') {
-							confirmed = true;
-						}
-					},
-					
-					error: function(error) {
-						console.error('Error: ', error);
-					},
-				});
-			});			
-		});
-		
-		$(document).ready(function() {
-			$('#loginButton').on('click', function() {
-				if (confirmed == true) {
-					$.ajax({
-						dataType: 'json',
-				  
-						url: 'https://212.233.76.232:5000/login',
-						type: 'POST', 
-						contentType: 'application/json', 
-						data: JSON.stringify({
-							user_side_data: {
-								operation_type: 'Login user',
-								user_data: {
-									login: $('#login').val(),
-									mail: mail,
-									password: $('#password').val(),
+			$(document).ready(function() {
+				$('#loginButton').on('click', function() {
+					if (confirmed == true) {
+						$.ajax({
+							dataType: 'json',
+							url: 'https://212.233.76.232:5000/api/login',
+							type: 'POST', 
+							contentType: 'application/json', 
+							data: JSON.stringify({
+								user_side_data: {
+									operation_type: 'Login user',
+									user_data: {
+										login: $('#login').val(),
+										mail: mail,
+										password: $('#password').val(),
+									},
 								},
-							},
-						}),
+							}),
 
-						success: function(response) {
-							if (response['response'] == 'Succes login') {
-								registerUser(response['user']['user_name'], response['user']['admin']);
-								window.location.replace("https://212.233.76.232/");
-							}
-					  
-							if (response['response'] == 'Wrong password') {
-								alert('Ошибка в логине или пароле');
-							}
-						},
+							success: function(response) {
+								if (response['response'] == 'Succes login') {
+									registerUser(response['user']['user_name'], response['user']['admin']);
+									localStorage.setItem('admin_token', response['user']['token']);
+									window.location.replace("https://212.233.76.232/");
+								}
 						
-						error: function(error) {
-							console.error('Error login:', error);
-						},
-					});
-				}
+								if (response['response'] == 'Wrong password') {
+									alert('Ошибка в логине или пароле');
+								}
+							},
+							
+							error: function(error) {
+								console.error('Error login:', error);
+							},
+						});
+					}
+				});
 			});
-		});
 		</script>
 		
 		<footer>
